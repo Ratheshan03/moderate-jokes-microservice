@@ -1,11 +1,21 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const jokeRoutes = require("./routes/jokeRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
 require("dotenv").config();
 
 const app = express();
+
+// CORS configuration
+app.use(
+  cors({
+    origin: "http://localhost:3003", // Allow requests from the frontend's origin
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-access-token"], // Allow x-access-token header
+  })
+);
 
 app.use(bodyParser.json());
 

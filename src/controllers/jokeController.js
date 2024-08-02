@@ -51,6 +51,7 @@ exports.submitJoke = async (req, res) => {
 exports.deleteJoke = async (req, res) => {
   const { jokeId } = req.body;
   try {
+    console.log(`Deleting joke with ID: ${jokeId}`);
     await axios.delete(`${SUBMIT_JOKES_URL}/jokes/${jokeId}`);
     res.status(200).send({ message: "Joke deleted successfully" });
   } catch (error) {
