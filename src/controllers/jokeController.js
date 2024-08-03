@@ -1,12 +1,10 @@
-const axios = require("axios");
-
-const SUBMIT_JOKES_URL = "172.17.0.3:3001";
-const DELIVER_JOKES_URL = "172.17.0.2:3000";
+const Joke = require("../models/jokeModel"); // MongoDB Model
+const MySQLJoke = require("../models/mysqlJokeModel"); // MySQL Model
 
 exports.getJoke = async (req, res) => {
   try {
-    const response = await axios.get(`${SUBMIT_JOKES_URL}/jokes`);
-    res.status(200).send(response.data);
+    const jokes = await Joke.find(); // MongoDB operation
+    res.status(200).send(jokes);
   } catch (error) {
     console.error("Error fetching joke:", error.message);
     res.status(500).send({ message: "Error fetching joke" });
@@ -15,14 +13,8 @@ exports.getJoke = async (req, res) => {
 
 exports.updateJoke = async (req, res) => {
   const { jokeId, content, type } = req.body;
-  console.log("Update Request Data:", { jokeId, content, type });
-
   try {
-    const response = await axios.put(`${SUBMIT_JOKES_URL}/jokes/${jokeId}`, {
-      content,
-      type,
-    });
-    console.log("Update Response:", response.data);
+    await Joke.findByIdAndUpdate(jokeId, { content, type }); // MongoDB operation
     res.status(200).send({ message: "Joke updated successfully" });
   } catch (error) {
     console.error("Error updating joke:", error.message);
@@ -32,16 +24,9 @@ exports.updateJoke = async (req, res) => {
 
 exports.submitJoke = async (req, res) => {
   const { joke, type } = req.body;
-
   try {
-    const jokeData = {
-      content: joke,
-      type: type,
-      is_moderated: true,
-    };
-
-    await axios.post(`${DELIVER_JOKES_URL}/jokes`, jokeData);
-    res.status(200).send({ message: "Joke submitted to Deliver Jokes" });
+    await MySQLJoke.create({ content: joke, type, is_moderated: true }); // MySQL operation
+    res.status(200).send({ message: "Joke submitted to MySQL" });
   } catch (error) {
     console.error("Error submitting joke:", error.message);
     res.status(500).send({ message: "Error submitting joke" });
@@ -51,8 +36,7 @@ exports.submitJoke = async (req, res) => {
 exports.deleteJoke = async (req, res) => {
   const { jokeId } = req.body;
   try {
-    console.log(`Deleting joke with ID: ${jokeId}`);
-    await axios.delete(`${SUBMIT_JOKES_URL}/jokes/${jokeId}`);
+    await Joke.findByIdAndDelete(jokeId); // MongoDB operation
     res.status(200).send({ message: "Joke deleted successfully" });
   } catch (error) {
     console.error("Error deleting joke:", error.message);

@@ -4,34 +4,62 @@ const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const jokeRoutes = require("./routes/jokeRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
+const mongoose = require("mongoose");
+const { Sequelize } = require("sequelize");
 require("dotenv").config();
 
 const app = express();
 
+// Connect to MongoDB
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((error) => console.error("MongoDB connection error:", error));
+
+// Connect to MySQL
+const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USERNAME,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: "mysql",
+  }
+);
+
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log("Connected to MySQL");
+
+    // Ensure MySQLJoke table is created or already exists
+    const MySQLJoke = require("./models/mysqlJokeModel");
+    sequelize.sync({ alter: true }).then(() => {
+      console.log("MySQLJoke table is ready");
+    });
+  })
+  .catch((error) => console.error("MySQL connection error:", error));
+
 // CORS configuration
 app.use(
   cors({
-    origin: "http://localhost:3003", // Allow requests from the frontend's origin
+    origin: "http://localhost:3003",
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization", "x-access-token"], // Allow x-access-token header
+    allowedHeaders: ["Content-Type", "Authorization", "x-access-token"],
   })
 );
 
 app.use(bodyParser.json());
 
-// Middleware for logging requests
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
   next();
 });
 
-// auth routes
 app.use("/api/auth", authRoutes);
-
-// joke routes
 app.use("/api/jokes", jokeRoutes);
 
-// Protected routes
 app.get("/api/protected", authMiddleware, (req, res) => {
   res.status(200).send("Access granted");
 });
