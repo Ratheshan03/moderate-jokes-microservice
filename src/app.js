@@ -6,9 +6,54 @@ const jokeRoutes = require("./routes/jokeRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
 const mongoose = require("mongoose");
 const { Sequelize } = require("sequelize");
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 require("dotenv").config();
 
 const app = express();
+
+// Swagger setup
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Jokes API",
+      version: "1.0.0",
+      description: "API documentation for the Jokes Microservice",
+    },
+    servers: [
+      {
+        url: "http://localhost:3002",
+      },
+    ],
+    components: {
+      schemas: {
+        Joke: {
+          type: "object",
+          properties: {
+            content: {
+              type: "string",
+              description: "The joke content",
+            },
+            type: {
+              type: "string",
+              description: "The joke category/type",
+            },
+            is_moderated: {
+              type: "boolean",
+              description: "Whether the joke is moderated",
+              default: true,
+            },
+          },
+        },
+      },
+    },
+  },
+  apis: ["./routes/*.js", "./controllers/*.js"],
+};
+
+const swaggerDocs = swaggerJsdoc(options);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Connect to MongoDB
 mongoose
