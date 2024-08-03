@@ -36,4 +36,3 @@ URL: http://localhost:3002/api-docs
 
 ## License
 Express is [MIT licensed](LICENSE).
-```
