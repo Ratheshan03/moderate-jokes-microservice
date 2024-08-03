@@ -27,18 +27,13 @@ This microservice enables a moderator to access submitted jokes, authenticate, e
 
 ## Running the app
 
-```
-
 node src/app.js
 
 ## Swagger API Documentation
 
-Access the Swagger UI to explore the API documentation:
+Once the serive is running, Access the Swagger UI to explore the API documentation:
 URL: http://localhost:3002/api-docs
 
-## Support
-
 ## License
-
 Express is [MIT licensed](LICENSE).
 ```
