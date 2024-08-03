@@ -1,7 +1,7 @@
 const axios = require("axios");
 
-const SUBMIT_JOKES_URL = "http://localhost:3001";
-const DELIVER_JOKES_URL = "http://localhost:3000";
+const SUBMIT_JOKES_URL = "172.17.0.3:3001";
+const DELIVER_JOKES_URL = "172.17.0.2:3000";
 
 exports.getJoke = async (req, res) => {
   try {
